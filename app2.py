@@ -1,12 +1,11 @@
 import streamlit as st
 from google import genai
 from google.genai import types
-from twilio.rest import Client as TwilioClient
+
 
 from prompts import (
     SYSTEM_PROMPT,
-    WELCOME_MESSAGE_TEMPLATE,
-    SUMMARY_REQUEST_PROMPT
+    WELCOME_MESSAGE_TEMPLATE
 )
 
 
@@ -28,10 +27,6 @@ st.set_page_config(
 
 GEMINI_API_KEY = st.secrets["GEMINI_API_KEY"]
 
-TWILIO_ACCOUNT_SID = st.secrets["TWILIO_ACCOUNT_SID"]
-TWILIO_AUTH_TOKEN = st.secrets["TWILIO_AUTH_TOKEN"]
-TWILIO_WHATSAPP_FROM = st.secrets["TWILIO_WHATSAPP_FROM"]
-TWILIO_CONTENT_SID = st.secrets["TWILIO_CONTENT_SID"]
 
 
 # -----------------------------
@@ -51,14 +46,7 @@ gemini_client = get_gemini_client()
 # -----------------------------
 
 @st.cache_resource
-def get_twilio_client():
-    return TwilioClient(
-        TWILIO_ACCOUNT_SID,
-        TWILIO_AUTH_TOKEN
-    )
 
-
-twilio_client = get_twilio_client()
 
 
 # -----------------------------
@@ -149,17 +137,29 @@ def render_message(message):
 
 def ask_gemini(parts):
 
-    try:
+    import time
 
-        response = st.session_state.chat.send_message(
-            parts
-        )
+    for attempt in range(3):
 
-        return response.text
+        try:
 
-    except Exception as e:
+            response = st.session_state.chat.send_message(
+                parts
+            )
 
-        return f"Sorry, something went wrong: {e}"
+            return response.text
+
+        except Exception as e:
+
+            if "503" in str(e):
+
+                time.sleep(3)
+
+            else:
+
+                return f"Sorry, something went wrong: {e}"
+
+    return "Gemini is temporarily busy. Please try again in a few seconds."
 
 
 # -----------------------------
