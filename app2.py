@@ -45,16 +45,6 @@ gemini_client = get_gemini_client()
 # Twilio client
 # -----------------------------
 
-@st.cache_resource
-def get_twilio_client():
-    return TwilioClient(
-        TWILIO_ACCOUNT_SID,
-        TWILIO_AUTH_TOKEN
-    )
-
-
-twilio_client = get_twilio_client()
-
 
 
 # -----------------------------
