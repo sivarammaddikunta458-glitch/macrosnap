@@ -53,59 +53,44 @@ gemini_client = get_gemini_client()
 # Onboarding
 # -----------------------------
 
+# -----------------------------
+# Onboarding
+# -----------------------------
+
 if "onboarded" not in st.session_state:
-
     st.title("🥗 MacroSnap")
-
     st.write("Your instant calorie & macro decoder!")
 
     with st.form("onboarding_form"):
-
         name = st.text_input("Your name")
+        whatsapp_number = st.text_input("WhatsApp number")
 
-        whatsapp_number = st.text_input(
-            "WhatsApp number"
-        )
-
-        submitted = st.form_submit_button(
-            "Start MacroSnap"
-        )
+        submitted = st.form_submit_button("Start MacroSnap")
 
         if submitted:
-
             if not name.strip():
-
                 st.error("Please enter your name.")
 
             elif not whatsapp_number.strip():
-
                 st.error("Please enter your WhatsApp number.")
 
             else:
-
                 st.session_state.name = name.strip()
+                st.session_state.whatsapp_number = whatsapp_number.strip()
 
-                st.session_state.whatsapp_number = (
-                    whatsapp_number.strip()
-                )
-
-                st.session_state.chat = (
-                    gemini_client.chats.create(
-                        model=MODEL_NAME,
-                        config=types.GenerateContentConfig(
-                            system_instruction=SYSTEM_PROMPT
-                        )
+                st.session_state.chat = gemini_client.chats.create(
+                    model=MODEL_NAME,
+                    config=types.GenerateContentConfig(
+                        system_instruction=SYSTEM_PROMPT
                     )
                 )
 
                 st.session_state.messages = []
-
                 st.session_state.onboarded = True
 
                 st.rerun()
 
     st.stop()
-
 
 # -----------------------------
 # Chat functions
